@@ -36,14 +36,14 @@ java/src/main/java/org/ikigaidigital
 ├── TimeDeposit, TimeDepositCalculator   legacy, same package and signatures; calculator now delegates to rules
 ├── Money, Withdrawal                    double → BigDecimal at the edges; read-only withdrawal record
 ├── interest/                            InterestRule (Strategy) · ExistingPlanInterest (30-day rule, rate / 12)
-│                                        · Basic/Student/PremiumPlanInterest
+│                                        · Basic/Student/PremiumPlanInterest · InterestRules (default plans)
 ├── application/                         UpdateAllBalances · ListTimeDeposits · ports TimeDepositRepository, WithdrawalRepository
 ├── adapter/web/                         controller implementing the generated contract interface · security headers
 ├── adapter/persistence/                 JDBC adapters (JdbcClient, explicit SQL) · Flyway V1 tables, V2 constraints
 └── config/                              Spring Boot app, use cases wired by hand
 ```
 
-Hexagonal: domain and application have no Spring imports, enforced by `ArchitectureTest`. **A new plan** is one class implementing `InterestRule`, added to the calculator's rule list; nothing else changes.
+Hexagonal: domain and application have no Spring imports, enforced by `ArchitectureTest`. **A new plan** is one class implementing `InterestRule`, added to `InterestRules.briefPlans()`; the calculator is not edited.
 
 ## Interest maths
 
@@ -82,7 +82,7 @@ One month = `balance × annual rate / 12`, rounded **HALF_UP to cents**, added t
 | Principle | Where | Why |
 |---|---|---|
 | SRP | `TimeDepositCalculator` (apply and round) vs `InterestRule`s (rates) vs adapters (I/O) | Rates, rounding and storage change for different reasons |
-| OCP | `InterestRule` + `TimeDepositCalculator(List<InterestRule>)` | New plan = new class (AC-6) |
+| OCP | `InterestRule` + `InterestRules` + `TimeDepositCalculator(List<InterestRule>)` | New plan = new class + one registry line (AC-6) |
 | LSP | Every rule honours `monthlyInterest`; unknown plans use a no-interest rule, no `null` | No special cases at call sites |
 | ISP | One small port per table: `TimeDepositRepository`, `WithdrawalRepository` | Partly: `ListTimeDeposits` sees the write methods of `TimeDepositRepository`; split read/write ports when a second writer appears |
 | DIP | Ports in `application`, implemented by `adapter.persistence`, wired by hand in `UseCaseConfig` | Domain never depends on Spring or JDBC |
@@ -105,6 +105,13 @@ One month = `balance × annual rate / 12`, rounded **HALF_UP to cents**, added t
 - **Audit and events:** append-only interest postings and a `BalanceUpdated` event instead of overwriting balances.
 - **Security:** OAuth2 resource server or mTLS at the gateway, operations role for the update (A-11); rate limiting.
 - **Scale:** process the book in pages inside the lock; paginate the list.
+- **From the self-review** (open, medium or low):
+  - a transaction timeout on the update (`spring.transaction.default-timeout`), so a stuck run cannot hold the book's locks;
+  - a deposit whose interest would cross the 10^13 cap is flagged and skipped instead of failing everyone's run;
+  - Swagger UI and `/v3/api-docs` only in the local and demo profiles;
+  - the demo seed advances the id sequences after its explicit ids;
+  - tests for drift at 9,999,999,999,999.99, an update on an empty book, the 500 error path, and `days`/`planType` left untouched;
+  - `List.copyOf` in `TimeDepositOverview`, and a stale `NUMERIC(19, 2)` comment in `JdbcTimeDepositRepository`.
 - **Observability:** metrics and structured logs for each run (deposits updated, total interest).
 
 ## AI-assisted development

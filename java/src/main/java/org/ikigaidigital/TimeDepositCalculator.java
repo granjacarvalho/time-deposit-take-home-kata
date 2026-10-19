@@ -7,10 +7,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
-import org.ikigaidigital.interest.BasicPlanInterest;
 import org.ikigaidigital.interest.InterestRule;
-import org.ikigaidigital.interest.PremiumPlanInterest;
-import org.ikigaidigital.interest.StudentPlanInterest;
+import org.ikigaidigital.interest.InterestRules;
 
 public class TimeDepositCalculator {
 
@@ -32,9 +30,9 @@ public class TimeDepositCalculator {
 
   private final Map<String, InterestRule> rulesByPlanType;
 
-  /** The three plans the brief defines; existing callers keep using this constructor. */
+  /** The brief's plans; existing callers keep using this constructor. */
   public TimeDepositCalculator() {
-    this(List.of(new BasicPlanInterest(), new StudentPlanInterest(), new PremiumPlanInterest()));
+    this(InterestRules.briefPlans());
   }
 
   /** Extension point (AC-6): a new plan is a new {@link InterestRule}, registered here. */
