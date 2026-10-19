@@ -24,3 +24,7 @@
 - Time-box counts work time across two days, with a Wed 09:00 UK cut-off before the 13:00 deadline.
 - Phase 4 adds Swagger trigger steps, `docs/ai/README.md` (tools, reproduce, what was AI-assisted) and the fork-PR base trap.
 - Trimmed to stay in budget: CLAUDE.md 1,194 tok, PROMPT.md 1,500 tok (words × 1.3).
+## 2026-10-19 — money, integrity and security made explicit
+- CLAUDE.md Design gains three rules: money (document formula and rounding; test the error bound where exact maths is not allowed), integrity (schema constraints, one transaction per use case, row locks, never edit an applied migration), security (parameterized SQL, no internals in responses, no-store, minimal surface, authentication never silent).
+- Tests and DoD follow: money and integrity tests; a README section mapping each risk to its control or assumption.
+- PROMPT.md: Phase 0 lists risks, Phase 3 reviews them, Phase 4 README reports them. CLAUDE.md now ~1,350 tok (over the 1,200 budget, accepted for these rules).

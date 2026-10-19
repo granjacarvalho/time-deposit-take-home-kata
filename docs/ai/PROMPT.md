@@ -26,6 +26,7 @@ If missing, clone my fork into `<slug>/` (the repo name). Read the brief and sta
 5. Design: each type with a one-line responsibility; the two endpoints (method · path · status · body) and the tables. Name a SOLID principle only where it drove a split. List what is deliberately not abstracted.
 6. Toolchain, versions pinned: test + assertion libs, formatter/linter, coverage, optional mutation. Evidence via `npx playwright` (no project dependency).
 7. Starter-code smells (smell · location · refactoring), ranked by impact.
+8. Risks: money maths, data integrity, API security — each with its control or an assumption `A-n`.
 
 ## Phase 1 — Scaffold ⛔
 In `<slug>/`:
@@ -41,14 +42,14 @@ In `<slug>/`:
 - ⛔ after the first AC. Then continue unless a stop trigger fires.
 
 ## Phase 3 — Refactor pass ⛔
-- Review all code for the CLAUDE.md smells and unused abstractions. One smell per commit, `<check>` green each time.
+- Review all code for the CLAUDE.md smells, unused abstractions, and the money, integrity and security rules. One smell per commit, `<check>` green each time.
 - If budget allows: mutation testing; a surviving mutant that shows a missing case gets a test.
 - Report: smell · location · move · commit.
 
 ## Phase 4 — Docs, evidence, PR ⛔
 1. `docs/TICKET.md`: final ticket, assumptions, estimate vs actual time.
 2. `docs/TRACEABILITY.md`: AC · test · cases · red reason · status.
-3. `README.md` at the repo root, ≤2 pages (kata brief moved to `docs/BRIEF.md`, linked): CI badge · run from fresh clone · trigger both endpoints in Swagger UI (URL, steps, sample) · assumptions · design tree · decisions & trade-offs · SOLID map (principle → class → why; where not applied) · quality numbers (tests, coverage, mutation, time vs estimate) · production next steps (idempotency, concurrency, audit, observability, security) · link to `docs/ai/README.md`.
+3. `README.md` at the repo root, ≤2 pages (kata brief moved to `docs/BRIEF.md`, linked): CI badge · run from fresh clone · trigger both endpoints in Swagger UI (URL, steps, sample) · assumptions · design tree · decisions & trade-offs · SOLID map (principle → class → why; where not applied) · quality numbers (tests, coverage, mutation, time vs estimate) · correctness, integrity and security (risk → control or assumption) · production next steps · link to `docs/ai/README.md`.
 4. `docs/ai/README.md`, ≤1 page: tools and models with versions · how to reproduce (`claude` in the repo root, then `Run docs/ai/PROMPT.md`) · what each file does · which parts were AI-assisted, why, and what I decided or reviewed · what is not included (my private interview notes).
 5. `docs/evidence/`: CI run, test and coverage reports, Swagger UI, `git log --oneline --graph`, mutation report if run. Screenshot HTML and terminal output (`--console=plain`, in `<pre>`) with `npx playwright screenshot` (first `npx playwright install chromium`). Can't capture one: say why, give manual steps.
 6. `REVIEW_NOTES.md` (repo's parent folder) as my presentation script:
