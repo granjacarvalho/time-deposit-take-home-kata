@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: time-deposit-kata
+springdoc:
+  # The hand-written contract is the single source of truth, so Swagger UI shows it as is.
+  api-docs:
+    enabled: false
+  swagger-ui:
+    url: /openapi.yaml

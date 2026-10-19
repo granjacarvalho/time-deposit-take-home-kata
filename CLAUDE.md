@@ -13,12 +13,12 @@
 - Assumptions `A-n` also as code comments where applied.
 - Branches and PRs only in my fork, never in `ikigai-digital/*`.
 
-## Commands (fill at scaffold; Git Bash; run from `java/`; all paths relative to the repo root)
+## Commands (Git Bash; run from `java/`; all paths relative to the repo root)
 ```
-<format>     # auto-format; run before <check>
-<check>      # lint + tests + coverage gate; before every commit
-<test>       # tests only
-<mutation>   # optional
+./mvnw spotless:apply   # <format>: auto-format; run before <check>
+./mvnw verify           # <check>: format, lint, unit + integration tests, coverage gate; needs Docker
+./mvnw test             # <test>: unit tests only
+./mvnw test-compile org.pitest:pitest-maven:mutationCoverage   # <mutation>: optional
 ```
 
 ## TDD loop (per AC, test-list order)
