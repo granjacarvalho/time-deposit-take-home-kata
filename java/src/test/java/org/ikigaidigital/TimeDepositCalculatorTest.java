@@ -59,4 +59,21 @@ class TimeDepositCalculatorTest {
       assertThat(balanceAfterUpdate("student", days)).isEqualTo(BALANCE);
     }
   }
+
+  @Nested
+  @DisplayName("AC-5 premium plan earns 5% a year, starting after 45 days")
+  class PremiumPlan {
+
+    @ParameterizedTest(name = "premium plan at {0} days -> 1205.00")
+    @CsvSource({"46", "365"})
+    void should_add_a_month_of_5_percent_when_premium_is_older_than_45_days(int days) {
+      assertThat(balanceAfterUpdate("premium", days)).isEqualTo(1205.00);
+    }
+
+    @ParameterizedTest(name = "premium plan at {0} days keeps 1200.00")
+    @CsvSource({"31", "45"})
+    void should_keep_balance_when_premium_is_45_days_or_younger(int days) {
+      assertThat(balanceAfterUpdate("premium", days)).isEqualTo(BALANCE);
+    }
+  }
 }
