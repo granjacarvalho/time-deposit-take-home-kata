@@ -41,4 +41,22 @@ class TimeDepositCalculatorTest {
       assertThat(balanceAfterUpdate("basic", days)).isEqualTo(1201.00);
     }
   }
+
+  @Nested
+  @DisplayName("AC-4 student plan earns 3% a year, but nothing after the first year")
+  class StudentPlan {
+
+    @ParameterizedTest(name = "student plan at {0} days -> 1203.00")
+    @CsvSource({"31", "365"})
+    void should_add_a_month_of_3_percent_when_student_is_within_first_year(int days) {
+      assertThat(balanceAfterUpdate("student", days)).isEqualTo(1203.00);
+    }
+
+    // A-4: "after 1 year" follows the legacy code, days < 366, so day 365 still earns.
+    @ParameterizedTest(name = "student plan at {0} days keeps 1200.00")
+    @CsvSource({"366", "1000"})
+    void should_keep_balance_when_student_is_older_than_a_year(int days) {
+      assertThat(balanceAfterUpdate("student", days)).isEqualTo(BALANCE);
+    }
+  }
 }
