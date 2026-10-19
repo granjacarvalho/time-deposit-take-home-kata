@@ -1,0 +1,16 @@
+# Weekly dependency updates as PRs; CI (tests, coverage, PIT) must pass before any merge.
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /java
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "chore(IKG-1)"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci(IKG-1)"

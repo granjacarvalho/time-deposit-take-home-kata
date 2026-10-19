@@ -28,3 +28,5 @@
 - CLAUDE.md Design gains three rules: money (document formula and rounding; test the error bound where exact maths is not allowed), integrity (schema constraints, one transaction per use case, row locks, never edit an applied migration), security (parameterized SQL, no internals in responses, no-store, minimal surface, authentication never silent).
 - Tests and DoD follow: money and integrity tests; a README section mapping each risk to its control or assumption.
 - PROMPT.md: Phase 0 lists risks, Phase 3 reviews them, Phase 4 README reports them. CLAUDE.md now ~1,350 tok (over the 1,200 budget, accepted for these rules).
+## 2026-10-19 — platform and QA review
+- CLAUDE.md: `<mutation>` is now a CI gate (fails under 90%), not optional.
