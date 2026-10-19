@@ -66,7 +66,7 @@
 - Fresh clone → `<check>` green — clone to a temp dir, output
 - CI green — run link
 - Coverage gate met, lint zero warnings — `<check>` output
-- No float money — grep `float|double` in main source: only the two legacy classes
+- No float money outside the legacy maths — grep `float|double` in main source: only the calculator, the `interest` rules it was split into, and `Money.fromLegacy`
 - No unused abstraction — interfaces with implementation counts
 - Correctness, integrity, security reviewed — README section: each risk with its control or assumption
 - Refactor commits name smell + move — `git log --oneline`

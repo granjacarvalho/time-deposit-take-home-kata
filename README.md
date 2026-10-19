@@ -96,7 +96,7 @@ One month = `balance × annual rate / 12`, rounded **HALF_UP to cents**, added t
 | Coverage (domain + application, gated at 90%) | lines 71/72 · branches 10/10 |
 | Mutation (PIT, domain + application) | 32/32 killed · test strength 100% |
 | History | feat, refactor (each names smell + move), test, ci, docs and chore commits; see `git log --oneline` |
-| Time | estimate 9.75 h; actual in [docs/TICKET.md](docs/TICKET.md) |
+| Time | estimate 9.75 h · actual 2.6 h elapsed, incl. ~30 min of setup waits ([docs/TICKET.md](docs/TICKET.md)) |
 
 ## Production next steps
 

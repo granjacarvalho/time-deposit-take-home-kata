@@ -37,4 +37,4 @@
 
 ## Estimate vs actual
 
-Estimate 9.75 h against a 10 h time-box. Actual: see the README quality numbers (work time from the time log; Docker installation waits excluded).
+Estimate 9.75 h against a 10 h time-box. Actual: 2.6 h of elapsed time on 2026-10-19 (14:35 to 17:12), including about 30 minutes waiting for Docker Desktop to install and the fork to exist. The estimate assumed hand-written code; the agent wrote most of it under the phase stops.
