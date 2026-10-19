@@ -30,4 +30,15 @@ class TimeDepositCalculatorTest {
       assertThat(balanceAfterUpdate(planType, days)).isEqualTo(BALANCE);
     }
   }
+
+  @Nested
+  @DisplayName("AC-3 basic plan earns 1% a year, paid monthly")
+  class BasicPlan {
+
+    @ParameterizedTest(name = "basic plan at {0} days -> 1201.00")
+    @CsvSource({"31", "365", "1000"})
+    void should_add_a_month_of_1_percent_when_basic_is_older_than_30_days(int days) {
+      assertThat(balanceAfterUpdate("basic", days)).isEqualTo(1201.00);
+    }
+  }
 }
