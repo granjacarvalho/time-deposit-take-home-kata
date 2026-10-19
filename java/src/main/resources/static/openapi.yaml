@@ -1,0 +1,82 @@
+openapi: 3.0.3
+info:
+  title: XA Bank Time Deposits API
+  version: 1.0.0
+  description: >
+    Exactly two endpoints, as the brief requires: list all time deposits, and
+    apply one month of interest to every stored deposit.
+    Authentication is not part of the brief (A-11): in production both
+    endpoints sit behind the bank's gateway, and the update needs an
+    operations role. Responses are Cache-Control no-store.
+servers:
+  - url: http://localhost:8080
+tags:
+  - name: TimeDeposits
+paths:
+  /time-deposits:
+    get:
+      tags: [TimeDeposits]
+      operationId: listTimeDeposits
+      summary: List all time deposits with their withdrawals
+      responses:
+        "200":
+          description: Every stored time deposit, ordered by id
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TimeDeposit"
+  /time-deposits/balance-updates:
+    post:
+      tags: [TimeDeposits]
+      operationId: updateBalances
+      summary: Apply one month of interest to every stored time deposit
+      description: >
+        Not idempotent (A-3): each call applies one more month of interest,
+        so this is a POST. Days are not advanced (A-1).
+      responses:
+        "204":
+          description: All balances updated
+components:
+  schemas:
+    TimeDeposit:
+      type: object
+      required: [id, planType, balance, days, withdrawals]
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        planType:
+          type: string
+          description: basic, student or premium; any other value earns no interest (A-4)
+          example: basic
+        balance:
+          type: number
+          description: Two decimal places (A-5)
+          example: 1234567.00
+        days:
+          type: integer
+          format: int32
+          example: 45
+        withdrawals:
+          type: array
+          items:
+            $ref: "#/components/schemas/Withdrawal"
+    Withdrawal:
+      type: object
+      required: [id, amount, date]
+      properties:
+        id:
+          type: integer
+          format: int32
+          example: 1
+        amount:
+          type: number
+          description: Two decimal places (A-5)
+          example: 100.00
+        date:
+          type: string
+          format: date
+          example: "2026-09-30"

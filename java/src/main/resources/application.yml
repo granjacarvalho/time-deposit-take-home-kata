@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: time-deposit-kata
+server:
+  # Error responses carry status and path only: no stack trace, exception or message.
+  error:
+    include-stacktrace: never
+    include-exception: false
+    include-message: never
+    include-binding-errors: never
+springdoc:
+  # Swagger UI shows the hand-written contract, the single source of truth. springdoc needs its
+  # /v3/api-docs endpoint for the UI to load; it is documentation, not an API endpoint (A-9).
+  swagger-ui:
+    url: /openapi.yaml
