@@ -1,34 +1,34 @@
 package org.ikigaidigital;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toUnmodifiableMap;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
+import org.ikigaidigital.interest.BasicPlanInterest;
+import org.ikigaidigital.interest.InterestRule;
+import org.ikigaidigital.interest.PremiumPlanInterest;
+import org.ikigaidigital.interest.StudentPlanInterest;
 
 public class TimeDepositCalculator {
+
+  private final Map<String, InterestRule> rulesByPlanType =
+      List.of(new BasicPlanInterest(), new StudentPlanInterest(), new PremiumPlanInterest())
+          .stream()
+          .collect(toUnmodifiableMap(InterestRule::planType, identity()));
+
   public void updateBalance(List<TimeDeposit> deposits) {
     for (TimeDeposit deposit : deposits) {
       deposit.setBalance(deposit.getBalance() + roundToCents(monthlyInterest(deposit)));
     }
   }
 
+  // A-4: an unknown or differently cased plan type earns no interest, as in the legacy code.
   private double monthlyInterest(TimeDeposit deposit) {
-    double interest = 0;
-
-    if (deposit.getDays() > 30) {
-      if (deposit.getPlanType().equals("student")) {
-        if (deposit.getDays() < 366) {
-          interest += deposit.getBalance() * 0.03 / 12;
-        }
-      } else if (deposit.getPlanType().equals("premium")) {
-        if (deposit.getDays() > 45) {
-          interest += deposit.getBalance() * 0.05 / 12;
-        }
-      } else if (deposit.getPlanType().equals("basic")) {
-        interest += deposit.getBalance() * 0.01 / 12;
-      }
-    }
-
-    return interest;
+    InterestRule rule = rulesByPlanType.get(deposit.getPlanType());
+    return rule == null ? 0 : rule.monthlyInterest(deposit);
   }
 
   // new BigDecimal(double), not BigDecimal.valueOf: it rounds the exact binary value, and changing
