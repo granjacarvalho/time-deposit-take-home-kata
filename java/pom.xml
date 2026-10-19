@@ -280,6 +280,10 @@
                     <excludedTestClasses>
                         <param>**.*IT</param>
                     </excludedTestClasses>
+                    <!-- CI gate: fails the build when tests stop catching injected faults -->
+                    <mutationThreshold>90</mutationThreshold>
+                    <coverageThreshold>90</coverageThreshold>
+                    <timestampedReports>false</timestampedReports>
                 </configuration>
             </plugin>
 

@@ -18,7 +18,7 @@
 ./mvnw spotless:apply   # <format>: before <check>
 ./mvnw verify           # <check>: format, lint, all tests, coverage gate; needs Docker
 ./mvnw test             # <test>: unit tests only
-./mvnw test-compile org.pitest:pitest-maven:mutationCoverage   # <mutation>: optional
+./mvnw test-compile org.pitest:pitest-maven:mutationCoverage   # <mutation>: CI gate, fails under 90%
 ```
 
 ## TDD loop (per AC, test-list order)

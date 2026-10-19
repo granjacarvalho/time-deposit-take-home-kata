@@ -23,6 +23,8 @@ jobs:
       # mvnw verifies the Maven download against distributionSha256Sum; Testcontainers uses the runner's Docker.
       - name: Format, lint, tests and coverage gate
         run: ./mvnw -B verify
+      - name: Mutation testing gate (PIT, 90%)
+        run: ./mvnw -B test-compile org.pitest:pitest-maven:mutationCoverage
       - name: Upload test and coverage reports
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -32,4 +34,5 @@ jobs:
             java/target/surefire-reports/
             java/target/failsafe-reports/
             java/target/site/jacoco/
+            java/target/pit-reports/
           if-no-files-found: ignore
