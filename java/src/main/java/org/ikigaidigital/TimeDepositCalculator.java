@@ -16,11 +16,18 @@ public class TimeDepositCalculator {
 
   private static final int CENTS_SCALE = 2;
 
-  private final Map<String, InterestRule> rulesByPlanType =
-      List.<InterestRule>of(
-              new BasicPlanInterest(), new StudentPlanInterest(), new PremiumPlanInterest())
-          .stream()
-          .collect(toUnmodifiableMap(InterestRule::planType, identity()));
+  private final Map<String, InterestRule> rulesByPlanType;
+
+  /** The three plans the brief defines; existing callers keep using this constructor. */
+  public TimeDepositCalculator() {
+    this(List.of(new BasicPlanInterest(), new StudentPlanInterest(), new PremiumPlanInterest()));
+  }
+
+  /** Extension point (AC-6): a new plan is a new {@link InterestRule}, registered here. */
+  public TimeDepositCalculator(List<InterestRule> rules) {
+    this.rulesByPlanType =
+        rules.stream().collect(toUnmodifiableMap(InterestRule::planType, identity()));
+  }
 
   public void updateBalance(List<TimeDeposit> deposits) {
     for (TimeDeposit deposit : deposits) {
