@@ -9,10 +9,13 @@ import org.ikigaidigital.TimeDeposit;
  */
 abstract class ExistingPlanInterest implements InterestRule {
 
+  private static final int LAST_DAY_WITHOUT_INTEREST = 30;
+  private static final int MONTHS_PER_YEAR = 12;
+
   @Override
   public final double monthlyInterest(TimeDeposit deposit) {
-    if (deposit.getDays() > 30 && earnsInterestAt(deposit.getDays())) {
-      return deposit.getBalance() * annualRate() / 12;
+    if (deposit.getDays() > LAST_DAY_WITHOUT_INTEREST && earnsInterestAt(deposit.getDays())) {
+      return deposit.getBalance() * annualRate() / MONTHS_PER_YEAR;
     }
     return 0;
   }

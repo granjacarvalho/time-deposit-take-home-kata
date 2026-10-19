@@ -2,6 +2,8 @@ package org.ikigaidigital.interest;
 
 public final class BasicPlanInterest extends ExistingPlanInterest {
 
+  private static final double ANNUAL_RATE = 0.01;
+
   @Override
   public String planType() {
     return "basic";
@@ -9,7 +11,7 @@ public final class BasicPlanInterest extends ExistingPlanInterest {
 
   @Override
   protected double annualRate() {
-    return 0.01;
+    return ANNUAL_RATE;
   }
 
   @Override

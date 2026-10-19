@@ -14,6 +14,8 @@ import org.ikigaidigital.interest.StudentPlanInterest;
 
 public class TimeDepositCalculator {
 
+  private static final int CENTS_SCALE = 2;
+
   private final Map<String, InterestRule> rulesByPlanType =
       List.<InterestRule>of(
               new BasicPlanInterest(), new StudentPlanInterest(), new PremiumPlanInterest())
@@ -35,6 +37,6 @@ public class TimeDepositCalculator {
   // new BigDecimal(double), not BigDecimal.valueOf: it rounds the exact binary value, and changing
   // it would change results (e.g. basic 18.00 earns 0.01, not 0.02). Behaviour must stay the same.
   private static double roundToCents(double amount) {
-    return new BigDecimal(amount).setScale(2, RoundingMode.HALF_UP).doubleValue();
+    return new BigDecimal(amount).setScale(CENTS_SCALE, RoundingMode.HALF_UP).doubleValue();
   }
 }
