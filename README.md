@@ -27,6 +27,8 @@ cd time-deposit-take-home-kata/java
 
 Without Swagger: `curl localhost:8080/time-deposits` and `curl -X POST localhost:8080/time-deposits/balance-updates`.
 
+Swagger's response viewer drops trailing zeros (`1234567`); the raw body keeps two decimals (`1234567.00`), as `curl` shows. Screenshots: [docs/evidence](docs/evidence/README.md).
+
 ## Design
 
 ```
