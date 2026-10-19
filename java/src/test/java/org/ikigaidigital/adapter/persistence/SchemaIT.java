@@ -3,7 +3,10 @@ package org.ikigaidigital.adapter.persistence;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import java.math.BigDecimal;
+import org.ikigaidigital.config.DatabaseFixture;
 import org.ikigaidigital.config.IntegrationTest;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,6 +21,11 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 class SchemaIT {
 
   @Autowired JdbcClient jdbc;
+
+  @BeforeEach
+  void setUp() {
+    new DatabaseFixture(jdbc).clear();
+  }
 
   @ParameterizedTest(name = "{0}.{1} is {2}, nullable {3}")
   @CsvSource(
@@ -75,5 +83,52 @@ class SchemaIT {
                     .update())
         .isInstanceOf(DataIntegrityViolationException.class)
         .hasMessageContaining("foreign key");
+  }
+
+  @ParameterizedTest(name = "rejects a time deposit with {0}")
+  @CsvSource(
+      useHeadersInDisplayName = true,
+      delimiter = '|',
+      textBlock =
+          """
+          rule                                   | planType | days | balance
+          a negative balance                     | basic    | 0    | -0.01
+          negative days                          | basic    | -1   | 0.00
+          a balance beyond exact double cents    | basic    | 0    | 10000000000000.00
+          """)
+  void should_reject_time_deposit_when_it_breaks_a_rule(
+      String rule, String planType, int days, BigDecimal balance) {
+    assertThatThrownBy(() -> insertTimeDeposit(planType, days, balance))
+        .isInstanceOf(DataIntegrityViolationException.class);
+  }
+
+  @ParameterizedTest(name = "rejects a withdrawal of {0}")
+  @CsvSource({"0.00", "-0.01"})
+  void should_reject_withdrawal_when_amount_is_not_positive(BigDecimal amount) {
+    int timeDepositId = insertTimeDeposit("basic", 0, BigDecimal.ZERO);
+
+    assertThatThrownBy(
+            () ->
+                jdbc.sql(
+                        """
+                        INSERT INTO withdrawals (timeDepositId, amount, date)
+                        VALUES (?, ?, DATE '2026-10-01')""")
+                    .params(timeDepositId, amount)
+                    .update())
+        .isInstanceOf(DataIntegrityViolationException.class);
+  }
+
+  @ParameterizedTest(name = "accepts balance {0}")
+  @CsvSource({"0.00", "9999999999999.99"})
+  void should_accept_time_deposit_when_balance_is_at_a_limit(BigDecimal balance) {
+    assertThat(insertTimeDeposit("basic", 0, balance)).isPositive();
+  }
+
+  private int insertTimeDeposit(String planType, int days, BigDecimal balance) {
+    return jdbc.sql(
+            "INSERT INTO timeDeposits (planType, days, balance) VALUES (?, ?, ?) RETURNING id")
+        .params(planType, days, balance)
+        .query(Integer.class)
+        .single();
   }
 }
