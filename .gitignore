@@ -8,3 +8,7 @@ __pycache__/
 .idea/
 package-lock.json
 .vscode/
+# Private interview notes live outside the repo; guard against accidental copies
+REVIEW_NOTES.md
+PRESENTATION.md
+.env
