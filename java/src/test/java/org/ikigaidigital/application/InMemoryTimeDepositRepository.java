@@ -21,6 +21,11 @@ class InMemoryTimeDepositRepository implements TimeDepositRepository {
   }
 
   @Override
+  public List<TimeDeposit> findAllForUpdate() {
+    return findAll();
+  }
+
+  @Override
   public void saveBalances(List<TimeDeposit> deposits) {
     deposits.forEach(deposit -> savedBalances.add(deposit.getBalance()));
   }

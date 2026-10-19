@@ -21,15 +21,12 @@ class JdbcTimeDepositRepository implements TimeDepositRepository {
 
   @Override
   public List<TimeDeposit> findAll() {
-    return jdbc.sql("SELECT id, planType, days, balance FROM timeDeposits ORDER BY id")
-        .query(
-            (rs, row) ->
-                new TimeDeposit(
-                    rs.getInt("id"),
-                    rs.getString("planType"),
-                    rs.getBigDecimal("balance").doubleValue(),
-                    rs.getInt("days")))
-        .list();
+    return query("SELECT id, planType, days, balance FROM timeDeposits ORDER BY id");
+  }
+
+  @Override
+  public List<TimeDeposit> findAllForUpdate() {
+    return query("SELECT id, planType, days, balance FROM timeDeposits ORDER BY id FOR UPDATE");
   }
 
   // A-5: the legacy double becomes NUMERIC(19, 2) only here, at the edge.
@@ -40,5 +37,17 @@ class JdbcTimeDepositRepository implements TimeDepositRepository {
         deposits.stream()
             .map(deposit -> new Object[] {Money.fromLegacy(deposit.getBalance()), deposit.getId()})
             .toList());
+  }
+
+  private List<TimeDeposit> query(String sql) {
+    return jdbc.sql(sql)
+        .query(
+            (rs, row) ->
+                new TimeDeposit(
+                    rs.getInt("id"),
+                    rs.getString("planType"),
+                    rs.getBigDecimal("balance").doubleValue(),
+                    rs.getInt("days")))
+        .list();
   }
 }

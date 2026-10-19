@@ -3,6 +3,13 @@ package org.ikigaidigital.adapter.web;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import org.ikigaidigital.config.DatabaseFixture;
 import org.ikigaidigital.config.IntegrationTest;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +18,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.web.client.RestClient;
 
@@ -55,5 +63,37 @@ class UpdateBalancesIT {
             entry(3, "1205.00"),
             entry(4, "1200.00"),
             entry(5, "18.01"));
+  }
+
+  // A-3: each call applies one more month; concurrent calls must not lose one (lost update).
+  @Test
+  void should_apply_one_month_per_call_when_updates_run_concurrently() throws Exception {
+    database.timeDeposit(1, "basic", 31, "1200.00");
+    int calls = 4;
+    CountDownLatch start = new CountDownLatch(1);
+    ExecutorService pool = Executors.newFixedThreadPool(calls);
+    List<Future<HttpStatusCode>> responses = new ArrayList<>();
+    for (int i = 0; i < calls; i++) {
+      responses.add(pool.submit(() -> postAfter(start)));
+    }
+
+    start.countDown();
+    for (Future<HttpStatusCode> response : responses) {
+      assertThat(response.get(30, TimeUnit.SECONDS)).isEqualTo(HttpStatus.NO_CONTENT);
+    }
+    pool.shutdown();
+
+    // 1200.00 -> 1201.00 -> 1202.00 -> 1203.00 -> 1204.00: each month adds 1.00 after rounding.
+    assertThat(database.balances()).containsExactly(entry(1, "1204.00"));
+  }
+
+  private HttpStatusCode postAfter(CountDownLatch start) throws InterruptedException {
+    start.await();
+    return RestClient.create("http://localhost:" + port)
+        .post()
+        .uri("/time-deposits/balance-updates")
+        .retrieve()
+        .toBodilessEntity()
+        .getStatusCode();
   }
 }

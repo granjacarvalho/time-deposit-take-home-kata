@@ -17,7 +17,7 @@ public class UpdateAllBalances {
   }
 
   public void updateAll() {
-    List<TimeDeposit> deposits = repository.findAll();
+    List<TimeDeposit> deposits = repository.findAllForUpdate();
     calculator.updateBalance(deposits);
     repository.saveBalances(deposits);
   }
