@@ -8,8 +8,20 @@ import java.util.List;
 
 /**
  * Records the golden master for {@code TimeDepositCalculatorCharacterizationTest}. Not a test: run
- * it once against the untouched legacy calculator (see the CSV header for the commit). Re-running
- * it after a refactor would only record the new behaviour, so never regenerate to make a test pass.
+ * it once against the untouched legacy calculator. Re-running it after a refactor would only
+ * record the new behaviour, so never regenerate to make a test pass.
+ *
+ * <p>How the committed CSV was recorded (Git Bash, from {@code java/}):
+ *
+ * <pre>
+ * mkdir -p /tmp/legacy/src/org/ikigaidigital /tmp/legacy/out
+ * for f in TimeDeposit TimeDepositCalculator; do
+ *   git show c4ea358:java/src/main/java/org/ikigaidigital/$f.java > /tmp/legacy/src/org/ikigaidigital/$f.java
+ * done
+ * javac -d /tmp/legacy/out /tmp/legacy/src/org/ikigaidigital/*.java
+ * java -cp /tmp/legacy/out tools/CharacterizationRecorder.java \
+ *   src/test/resources/characterization/update-balance.csv "upstream commit c4ea358"
+ * </pre>
  */
 public final class CharacterizationRecorder {
 
