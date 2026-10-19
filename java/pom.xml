@@ -113,6 +113,7 @@
                             <generatorName>spring</generatorName>
                             <apiPackage>org.ikigaidigital.adapter.web.api</apiPackage>
                             <modelPackage>org.ikigaidigital.adapter.web.api.model</modelPackage>
+                            <modelNameSuffix>Dto</modelNameSuffix>
                             <generateSupportingFiles>false</generateSupportingFiles>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>
