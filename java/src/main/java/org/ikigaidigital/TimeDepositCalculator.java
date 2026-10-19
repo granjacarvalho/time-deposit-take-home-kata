@@ -16,6 +16,20 @@ public class TimeDepositCalculator {
 
   private static final int CENTS_SCALE = 2;
 
+  // A-4: an unknown or differently cased plan type earns no interest, as in the legacy code.
+  private static final InterestRule NO_INTEREST =
+      new InterestRule() {
+        @Override
+        public String planType() {
+          return "";
+        }
+
+        @Override
+        public double monthlyInterest(TimeDeposit deposit) {
+          return 0;
+        }
+      };
+
   private final Map<String, InterestRule> rulesByPlanType;
 
   /** The three plans the brief defines; existing callers keep using this constructor. */
@@ -35,10 +49,10 @@ public class TimeDepositCalculator {
     }
   }
 
-  // A-4: an unknown or differently cased plan type earns no interest, as in the legacy code.
   private double monthlyInterest(TimeDeposit deposit) {
-    InterestRule rule = rulesByPlanType.get(deposit.getPlanType());
-    return rule == null ? 0 : rule.monthlyInterest(deposit);
+    return rulesByPlanType
+        .getOrDefault(deposit.getPlanType(), NO_INTEREST)
+        .monthlyInterest(deposit);
   }
 
   // new BigDecimal(double), not BigDecimal.valueOf: it rounds the exact binary value, and changing
