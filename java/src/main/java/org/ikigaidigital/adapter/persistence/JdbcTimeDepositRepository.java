@@ -4,16 +4,19 @@ import java.util.List;
 import org.ikigaidigital.Money;
 import org.ikigaidigital.TimeDeposit;
 import org.ikigaidigital.application.port.TimeDepositRepository;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 @Repository
 class JdbcTimeDepositRepository implements TimeDepositRepository {
 
+  private final JdbcTemplate jdbcTemplate;
   private final JdbcClient jdbc;
 
-  JdbcTimeDepositRepository(JdbcClient jdbc) {
-    this.jdbc = jdbc;
+  JdbcTimeDepositRepository(JdbcTemplate jdbcTemplate) {
+    this.jdbcTemplate = jdbcTemplate;
+    this.jdbc = JdbcClient.create(jdbcTemplate);
   }
 
   @Override
@@ -32,10 +35,10 @@ class JdbcTimeDepositRepository implements TimeDepositRepository {
   // A-5: the legacy double becomes NUMERIC(19, 2) only here, at the edge.
   @Override
   public void saveBalances(List<TimeDeposit> deposits) {
-    deposits.forEach(
-        deposit ->
-            jdbc.sql("UPDATE timeDeposits SET balance = ? WHERE id = ?")
-                .params(Money.fromLegacy(deposit.getBalance()), deposit.getId())
-                .update());
+    jdbcTemplate.batchUpdate(
+        "UPDATE timeDeposits SET balance = ? WHERE id = ?",
+        deposits.stream()
+            .map(deposit -> new Object[] {Money.fromLegacy(deposit.getBalance()), deposit.getId()})
+            .toList());
   }
 }
