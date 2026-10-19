@@ -5,6 +5,9 @@ info:
   description: >
     Exactly two endpoints, as the brief requires: list all time deposits, and
     apply one month of interest to every stored deposit.
+    Authentication is not part of the brief (A-11): in production both
+    endpoints sit behind the bank's gateway, and the update needs an
+    operations role. Responses are Cache-Control no-store.
 servers:
   - url: http://localhost:8080
 tags:
