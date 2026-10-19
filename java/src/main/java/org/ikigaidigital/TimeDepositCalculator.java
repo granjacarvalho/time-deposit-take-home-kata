@@ -15,7 +15,8 @@ import org.ikigaidigital.interest.StudentPlanInterest;
 public class TimeDepositCalculator {
 
   private final Map<String, InterestRule> rulesByPlanType =
-      List.of(new BasicPlanInterest(), new StudentPlanInterest(), new PremiumPlanInterest())
+      List.<InterestRule>of(
+              new BasicPlanInterest(), new StudentPlanInterest(), new PremiumPlanInterest())
           .stream()
           .collect(toUnmodifiableMap(InterestRule::planType, identity()));
 

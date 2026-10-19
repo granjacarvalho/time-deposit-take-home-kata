@@ -1,8 +1,6 @@
 package org.ikigaidigital.interest;
 
-import org.ikigaidigital.TimeDeposit;
-
-public final class PremiumPlanInterest implements InterestRule {
+public final class PremiumPlanInterest extends ExistingPlanInterest {
 
   @Override
   public String planType() {
@@ -10,10 +8,12 @@ public final class PremiumPlanInterest implements InterestRule {
   }
 
   @Override
-  public double monthlyInterest(TimeDeposit deposit) {
-    if (deposit.getDays() > 30 && deposit.getDays() > 45) {
-      return deposit.getBalance() * 0.05 / 12;
-    }
-    return 0;
+  protected double annualRate() {
+    return 0.05;
+  }
+
+  @Override
+  protected boolean earnsInterestAt(int days) {
+    return days > 45;
   }
 }
