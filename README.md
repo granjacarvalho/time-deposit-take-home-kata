@@ -11,7 +11,7 @@ Needs **Java 17+** and **Docker** running. Maven comes with the wrapper. Command
 ```bash
 git clone https://github.com/granjacarvalho/time-deposit-take-home-kata.git
 cd time-deposit-take-home-kata/java
-./mvnw verify                 # format check, lint, 390 unit + 34 integration tests, coverage gate
+./mvnw verify                 # format check, lint, 1,390 unit + 35 integration tests, coverage gate
 ./mvnw spring-boot:test-run   # app on :8080, PostgreSQL 17 in Docker, demo data loaded
 ```
 
@@ -65,7 +65,8 @@ One month = `balance × annual rate / 12`, rounded **HALF_UP to cents**, added t
 | SQL injection | Parameterized SQL only; no request input reaches SQL | code review |
 | Leaking internals or cached balances | Errors without trace/exception/message; `Cache-Control: no-store`, `nosniff` on every response | `ApiHardeningIT` |
 | Unauthorized balance update | **Assumption A-11:** gateway authentication; update needs an operations role | contract description |
-| Extra attack surface | Exactly two endpoints; no Actuator | contract, `ApiHardeningIT` |
+| Extra attack surface | Exactly two endpoints; no Actuator | `ApiSurfaceIT` (running app vs contract), `ApiHardeningIT` |
+| Vulnerable dependencies or code | Dependabot (Maven, Actions) and CodeQL on every PR | `.github/` |
 
 ## Decisions and trade-offs
 
@@ -92,9 +93,9 @@ One month = `balance × annual rate / 12`, rounded **HALF_UP to cents**, added t
 
 | | |
 |---|---|
-| Tests | 390 unit · 34 integration (Testcontainers PostgreSQL 17) |
-| Coverage (domain + application, gated at 90%) | lines 71/72 · branches 10/10 |
-| Mutation (PIT, domain + application) | 32/32 killed · test strength 100% |
+| Tests | 1,390 unit (1,000 of them random-balance precision cases) · 35 integration (Testcontainers PostgreSQL 17) |
+| Coverage (domain + application, gated at 90%) | lines 72/73 · branches 10/10 |
+| Mutation (PIT, domain + application, gated at 90% in CI) | 33/33 killed · test strength 100% |
 | History | feat, refactor (each names smell + move), test, ci, docs and chore commits; see `git log --oneline` |
 | Time | estimate 9.75 h · actual 2.6 h elapsed, incl. ~30 min of setup waits ([docs/TICKET.md](docs/TICKET.md)) |
 
@@ -105,6 +106,13 @@ One month = `balance × annual rate / 12`, rounded **HALF_UP to cents**, added t
 - **Audit and events:** append-only interest postings and a `BalanceUpdated` event instead of overwriting balances.
 - **Security:** OAuth2 resource server or mTLS at the gateway, operations role for the update (A-11); rate limiting.
 - **Scale:** process the book in pages inside the lock; paginate the list.
+- **API, platform and QA** (to discuss, not built: overengineering for this kata):
+  - an `Idempotency-Key` header or per-deposit "paid for month M" marker on the update (A-3);
+  - RFC 7807 error bodies, `/v1` versioning and paging once there are real consumers;
+  - correlation-id logs and run metrics pushed with OpenTelemetry (Actuator would add endpoints);
+  - a buildpacks container image with a Trivy scan, a CycloneDX SBOM, and migrations as their own deploy step;
+  - a load test of the monthly run on 100k deposits to size the lock and paging;
+  - branch protection on `main` (CI required, no direct pushes).
 - **From the self-review** (open, medium or low):
   - a transaction timeout on the update (`spring.transaction.default-timeout`), so a stuck run cannot hold the book's locks;
   - a deposit whose interest would cross the 10^13 cap is flagged and skipped instead of failing everyone's run;
