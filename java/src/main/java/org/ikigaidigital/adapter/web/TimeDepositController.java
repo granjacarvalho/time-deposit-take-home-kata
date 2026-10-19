@@ -9,6 +9,7 @@ import org.ikigaidigital.application.ListTimeDeposits;
 import org.ikigaidigital.application.TimeDepositOverview;
 import org.ikigaidigital.application.UpdateAllBalances;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,8 +25,9 @@ class TimeDepositController implements TimeDepositsApi {
     this.updateAllBalances = updateAllBalances;
   }
 
+  // Two queries (deposits, withdrawals) read one snapshot, so a list never mixes two moments.
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
   public ResponseEntity<List<TimeDepositDto>> listTimeDeposits() {
     return ResponseEntity.ok(
         listTimeDeposits.listAll().stream().map(TimeDepositController::toDto).toList());
