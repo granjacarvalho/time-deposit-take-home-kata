@@ -35,3 +35,7 @@
 - CLAUDE.md Tests rewritten: one behaviour per test, literal values in the body, stack naming conventions, one test per rule, explicit list of what counts as logic, test pyramid with slice tests, behaviour over internals, one fixture style.
 - Characterization net demoted to a labelled guard; readable tests carry the intent. New DoD item: Phase 3 test-only review.
 - PROMPT.md: Phase 0 fixes the test style; Phase 2 writes one readable test per rule after the net; Phase 3 adds the test-only review, which is never cut.
+## 2026-10-21 — lessons from the rejection
+- Lessons: we optimised for proof over the reader; volume and extras read as noise; the agent wrote and reviewed its own work; no style was fixed before writing; we ignored mainstream Java conventions; we submitted after ~3 of 48 hours.
+- PROMPT.md: conventions input; Phase 0 reviewer rubric; the first-AC stop is now a style approval of the whole test file; new Phase 3b cold review by a reviewer with no history, then my own read of the tests; done early means re-read the next day, and extras are cut first.
+- CLAUDE.md: polish what is graded before any extra; stop for style approval after a suite's first test; write like a senior engineer of the stack, not like a generator.
