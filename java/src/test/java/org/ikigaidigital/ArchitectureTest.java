@@ -6,11 +6,13 @@ import com.tngtech.archunit.core.importer.ImportOption;
 import com.tngtech.archunit.junit.AnalyzeClasses;
 import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
+import org.junit.jupiter.api.DisplayName;
 
 // Hexagonal rule from CLAUDE.md, enforced in the build instead of by convention.
 @AnalyzeClasses(
     packages = "org.ikigaidigital",
     importOptions = ImportOption.DoNotIncludeTests.class)
+@DisplayName("Hexagonal boundaries")
 class ArchitectureTest {
 
   private static final String[] CORE = {
@@ -18,7 +20,7 @@ class ArchitectureTest {
   };
 
   @ArchTest
-  static final ArchRule should_keep_domain_and_application_free_of_spring =
+  static final ArchRule domainAndApplicationDoNotUseSpring =
       noClasses()
           .that()
           .resideInAnyPackage(CORE)
@@ -27,7 +29,7 @@ class ArchitectureTest {
           .resideInAnyPackage("org.springframework..");
 
   @ArchTest
-  static final ArchRule should_keep_domain_and_application_independent_of_adapters =
+  static final ArchRule domainAndApplicationDoNotDependOnAdapters =
       noClasses()
           .that()
           .resideInAnyPackage(CORE)

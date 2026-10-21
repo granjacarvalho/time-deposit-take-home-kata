@@ -7,7 +7,7 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * Records the golden master for {@code TimeDepositCalculatorCharacterizationTest}. Not a test: run
+ * Records the golden master for {@code TimeDepositCalculatorGoldenMasterTest}. Not a test: run
  * it once against the untouched legacy calculator. Re-running it after a refactor would only
  * record the new behaviour, so never regenerate to make a test pass.
  *

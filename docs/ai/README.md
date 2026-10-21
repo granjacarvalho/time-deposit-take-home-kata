@@ -47,7 +47,7 @@ Key guardrails in `CLAUDE.md`: never edit a test to make it pass; never commit u
 
 ## What the guardrails missed
 
-The reviewers rejected the submission on test quality: structure, clarity, consistency. They were right that the rules optimised for proof a machine can count (coverage, mutation score, red reasons) and never for a person reading the tests. The result was overlapping suites, logic in tests and Java-unusual names. The rules are rewritten in `CLAUDE.md` (Tests) and `PROMPT.md` (Phase 3 test-only review); the tests in this repo still show the old style.
+The reviewers rejected the submission on test quality: structure, clarity, consistency. They were right that the rules optimised for proof a machine can count (coverage, mutation score, red reasons) and never for a person reading the tests. The result was overlapping suites, logic in tests and Java-unusual names. The rules are rewritten in `CLAUDE.md` (Tests) and `PROMPT.md` (Phase 3 test-only review), and the tests were reworked to them afterwards: one readable test per rule with literal values, Java naming, the golden master labelled as a guard, behaviour instead of schema metadata, one API test class with one client and one fixture.
 
 ## Not included
 

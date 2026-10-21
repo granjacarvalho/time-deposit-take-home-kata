@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
 @IntegrationTest
-@DisplayName("AC-8 balances survive the NUMERIC <-> legacy double round trip")
+@DisplayName("JdbcTimeDepositRepository keeps every cent between NUMERIC and the legacy double")
 class JdbcTimeDepositRepositoryIT {
 
   @Autowired TimeDepositRepository repository;
@@ -29,10 +29,10 @@ class JdbcTimeDepositRepositoryIT {
     database.clear();
   }
 
-  @ParameterizedTest(name = "stored {0} loads as double {0}")
-  @CsvSource({"0.01", "18.01", "1234567.89", "99999999999.99"})
-  void should_load_balance_as_legacy_double_when_found(String balance) {
-    database.timeDeposit(1, "basic", 0, balance);
+  @ParameterizedTest(name = "stored {0} loads as {0}")
+  @CsvSource({"0.01", "18.01", "1234567.89", "9999999999999.99"})
+  void loadsAStoredBalanceAsTheSameDouble(String balance) {
+    database.insertTimeDeposit(1, "basic", 0, balance);
 
     var deposits = repository.findAll();
 
@@ -42,10 +42,10 @@ class JdbcTimeDepositRepositoryIT {
         .isEqualTo(Double.valueOf(balance));
   }
 
-  @ParameterizedTest(name = "double {0} is stored as {0}")
-  @CsvSource({"0.01", "18.01", "1234567.89", "99999999999.99"})
-  void should_store_balance_without_drift_when_saved(String balance) {
-    database.timeDeposit(1, "basic", 0, "0.00");
+  @ParameterizedTest(name = "{0} is saved as {0}")
+  @CsvSource({"0.01", "18.01", "1234567.89", "9999999999999.99"})
+  void savesABalanceWithoutLosingACent(String balance) {
+    database.insertTimeDeposit(1, "basic", 0, "0.00");
     var deposits = repository.findAll();
     deposits.forEach(deposit -> deposit.setBalance(Double.valueOf(balance)));
 
