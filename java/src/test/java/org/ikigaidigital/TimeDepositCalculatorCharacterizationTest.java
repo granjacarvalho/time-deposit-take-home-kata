@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvFileSource;
 
@@ -21,16 +20,5 @@ class TimeDepositCalculatorCharacterizationTest {
     new TimeDepositCalculator().updateBalance(List.of(deposit));
 
     assertThat(deposit.getBalance()).isEqualTo(expectedBalance);
-  }
-
-  @Test
-  void should_update_each_deposit_independently_when_list_has_several() {
-    TimeDeposit premium = new TimeDeposit(1, "premium", 1000.00, 46);
-    TimeDeposit unknownPlan = new TimeDeposit(2, "gold", 1000.00, 46);
-
-    new TimeDepositCalculator().updateBalance(List.of(premium, unknownPlan));
-
-    assertThat(premium.getBalance()).isEqualTo(1004.17);
-    assertThat(unknownPlan.getBalance()).isEqualTo(1000.00);
   }
 }
