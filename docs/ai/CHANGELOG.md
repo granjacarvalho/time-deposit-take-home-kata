@@ -30,3 +30,8 @@
 - PROMPT.md: Phase 0 lists risks, Phase 3 reviews them, Phase 4 README reports them. CLAUDE.md now ~1,350 tok (over the 1,200 budget, accepted for these rules).
 ## 2026-10-19 — platform and QA review
 - CLAUDE.md: `<mutation>` is now a CI gate (fails under 90%), not optional.
+## 2026-10-21 — reviewer feedback: tests not readable or consistent enough
+- Root cause: the rules rewarded measurable proof (coverage, mutants, red reasons, counts) and never asked whether a person can read the tests; the agent produced overlapping, logic-heavy suites.
+- CLAUDE.md Tests rewritten: one behaviour per test, literal values in the body, stack naming conventions, one test per rule, explicit list of what counts as logic, test pyramid with slice tests, behaviour over internals, one fixture style.
+- Characterization net demoted to a labelled guard; readable tests carry the intent. New DoD item: Phase 3 test-only review.
+- PROMPT.md: Phase 0 fixes the test style; Phase 2 writes one readable test per rule after the net; Phase 3 adds the test-only review, which is never cut.

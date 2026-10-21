@@ -1,12 +1,12 @@
 # CLAUDE.md — Ikigai Digital take-home
 
 ## Goal
-- Deliver the brief in `PROMPT.md` as a senior Product Engineer owning code, QA, CI and delivery. Every practice must leave something a reviewer sees.
+- Deliver the brief in `PROMPT.md` as a senior Product Engineer owning code, QA, CI and delivery. Every practice leaves something a reviewer sees, and reviewers read the tests first: they must read as the spec.
 - Graded in order: TDD → parameterized tests → refactoring → SOLID. Also: naming, money correctness, delivery hygiene, every decision defensible in one sentence.
 - Precedence: brief > my answers > this file > tool defaults.
 
 ## This brief: XA Bank time-deposit kata (overrides the sections below)
-- Never change `org.ikigaidigital.TimeDeposit` or `TimeDepositCalculator.updateBalance(List<TimeDeposit>)`: package, signature, behaviour, including the `double` maths and rounding. Pin them with characterization tests before any refactor.
+- Never change `org.ikigaidigital.TimeDeposit` or `TimeDepositCalculator.updateBalance(List<TimeDeposit>)`: package, signature, behaviour, including the `double` maths and rounding. Pin them with a characterization net before any refactor; readable tests carry the intent.
 - `BigDecimal` in new code, DB and API; the legacy `double` stays (README next step).
 - Exactly two endpoints, defined in the OpenAPI contract. Hexagonal: no Spring in domain or use cases.
 - No input validation or exception handling (not required).
@@ -44,14 +44,19 @@
 - Never return null.
 - Small methods, one abstraction level, comments only for *why*.
 
-## Tests
-- Tests are the spec: `should_<outcome>_when_<condition>`, AC id in `@DisplayName`/describe. AAA, no logic, deterministic.
-- Each AC → ≥1 test through the public API, tagged `AC-n`; use cases also unit-tested with in-memory ports.
-- Parameterize when ≥2 cases share one assertion shape; valid and invalid cases in separate tests. Give cases readable names (`@ParameterizedTest(name = …)` or CSV headers) so the test report reads as the spec.
-- Money tests cover each boundary, rounding traps and scale; integrity tests prove the schema rejects bad rows.
+## Tests (a reviewer reads them first: write for the reader, not for counts)
+- One behaviour per test, understood in 10 seconds. Arrange, act and assert visible in the test body; inputs and expected values are literals in the test, not hidden in helpers or constants.
+- Names follow the stack's convention (Java: camelCase method plus a `@DisplayName` sentence, or `@Nested` Given/When/Then). AC ids live in TRACEABILITY, not in names.
+- One test per rule; no suites that repeat each other. Test count, coverage and mutation score are checks, never goals.
+- No logic in tests: no loops, random data, computed expected values, reflection or parsing.
+- Parameterize only boundary rows of one rule: at most ~8 named rows, never generated.
+- Legacy code: a characterization net is one labelled regression guard, not the spec; shrink it once readable tests cover each rule.
+- Pyramid: unit tests for rules and use cases (in-memory ports); slice tests for adapters (`@WebMvcTest`, `@JdbcTest`); one or two end-to-end tests with Testcontainers.
+- Test behaviour, not framework or schema internals: prove a rule by a rejected write or a response, not by reading metadata.
+- One fixture style and one test client per suite; shared setup in one place; close what you open.
+- Money tests cover each boundary and rounding trap. Mock only owned ports, never value objects.
 - Edges the brief doesn't state are assumptions `A-n`, implemented only after approval.
-- Mock only owned ports, never value objects.
-- Coverage ≥90% line+branch on the domain is a floor; prefer killing mutants.
+- Coverage ≥90% line+branch on the domain is a floor; mutation testing finds missing cases, it never excuses an unreadable test.
 
 ## Git
 - Repo = clone of my fork in `<slug>/`. `main` + `feature/IKG-1-<slug>`. Commits `feat|refactor|test|ci|docs|chore(IKG-1): …`; one AC per `feat`, one smell per `refactor`.
@@ -61,6 +66,7 @@
 
 ## Definition of Done (item — proof)
 - Every AC has a named passing test — TRACEABILITY + test report
+- Tests read as the spec — Phase 3 test-only review: one behaviour each, literal values, no logic, one fixture style
 - Legacy behaviour pinned first — characterization commit before the first refactor in `git log`
 - Exactly two endpoints — paths in the OpenAPI contract
 - Fresh clone → `<check>` green — clone to a temp dir, output
