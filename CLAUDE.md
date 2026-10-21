@@ -4,6 +4,7 @@
 - Deliver the brief in `PROMPT.md` as a senior Product Engineer owning code, QA, CI and delivery. Every practice leaves something a reviewer sees, and reviewers read the tests first: they must read as the spec.
 - Graded in order: TDD → parameterized tests → refactoring → SOLID. Also: naming, money correctness, delivery hygiene, every decision defensible in one sentence.
 - Precedence: brief > my answers > this file > tool defaults.
+- Polish what is graded first (tests, then naming and structure) before adding anything extra; fewer, clearer files beat more proof.
 
 ## This brief: XA Bank time-deposit kata (overrides the sections below)
 - Never change `org.ikigaidigital.TimeDeposit` or `TimeDepositCalculator.updateBalance(List<TimeDeposit>)`: package, signature, behaviour, including the `double` maths and rounding. Pin them with a characterization net before any refactor; readable tests carry the intent.
@@ -32,6 +33,7 @@
 - a type, interface, dependency, tool or layer outside the approved Refine plan is needed
 - the brief is ambiguous or an existing test looks wrong
 - the time checkpoint in `PROMPT.md` is reached
+- the first test of a suite is written: show it for style approval
 
 ## Design
 - Simplest design that satisfies the brief; no layer, framework or tool it doesn't ask for.
@@ -92,4 +94,4 @@
 - Commit secrets or generated reports (except `docs/evidence/`) → `.gitignore`.
 
 ## Style
-Terse. Code > prose. One-line trade-offs. Challenge me when a simpler or safer option exists.
+Terse. Code > prose. One-line trade-offs. Challenge me when a simpler or safer option exists. Write code, tests and docs the way a senior engineer of the stack would, not like a generator: comments only where a reviewer would ask why.

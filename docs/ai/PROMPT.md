@@ -9,13 +9,15 @@ Follow CLAUDE.md. Work in phases. At each ⛔ show the outputs and wait for my "
 - Starter code: `java/`. Its only test asserts nothing; replacing it with characterization tests is approved.
 - Remote: `https://github.com/<<<my GitHub user>>>/time-deposit-take-home-kata` (public fork). On a certificate error: `git -c http.sslBackend=schannel`.
 - Company context (README next steps and REVIEW_NOTES only, never requirements): Ikigai Digital, UK consultancy building and modernising digital banks on thin-core platforms (Thought Machine Vault, 10x), event-driven; "think big, start small". In code, only zero-scope choices: banking vocabulary, immutable records.
+- Conventions the reviewers expect (ask the recruiter if unsure): <<<test style, naming, structure>>>. Default: the stack's mainstream style (Java: camelCase, `@Nested`, AssertJ, slice tests).
 - AI policy: required and graded (brief §6) → Co-Authored-By trailer: keep · README AI note: yes, detail in `docs/ai/README.md`.
 
 ## Time-box
 - Count work time, not wall-clock: log `date` in the REVIEW_NOTES time log at each phase start, each ⛔, and when I say "pause" or "resume". Show elapsed / time-box in every report.
 - Budget: Phase 0 10% · 1 15% · 2 50% · 3 10% · 4 15%.
 - At 80% elapsed, when a phase overruns its budget by half, or on Wed 21 Oct at 09:00 UK: stop, report, and propose cuts in this order: screenshots (manual steps instead) → mutation testing → TRACEABILITY folded into TICKET → Phase 3 pass (per-AC refactors stay) → short SOLID map.
-- Never cut: TDD per AC, parameterized tests, the test-only review, refactor commits, `<check>` and CI green, money correctness, README run + assumptions.
+- Done early? Stop, and re-read the tests the next day before submitting. Cut extras first; the time-box is a limit, not a target.
+- Never cut: TDD per AC, parameterized tests, the test-only review, the cold review, refactor commits, `<check>` and CI green, money correctness, README run + assumptions.
 
 ## Phase 0 — Refine (no code) ⛔
 If missing, clone my fork into `<slug>/` (the repo name). Read the brief and starter code in full. Output ≤80 lines:
@@ -27,6 +29,7 @@ If missing, clone my fork into `<slug>/` (the repo name). Read the brief and sta
 6. Toolchain, versions pinned: test + assertion libs, formatter/linter, coverage, optional mutation. Evidence via `npx playwright` (no project dependency).
 7. Starter-code smells (smell · location · refactoring), ranked by impact.
 8. Risks: money maths, data integrity, API security — each with its control or an assumption `A-n`.
+9. Reviewer rubric: 5–8 yes/no checks for how this brief will be judged, from the brief, the email and the company, tests first (e.g. "each test reads alone in 10 seconds"). Phase 3b and the DoD use it.
 
 ## Phase 1 — Scaffold ⛔
 In `<slug>/`:
@@ -39,13 +42,18 @@ In `<slug>/`:
 ## Phase 2 — TDD per AC (test-list order)
 - First pin current behaviour with one labelled characterization net; commit `test(IKG-1): characterize <area>`. Then write one readable test per rule, refactor in small steps, then add behaviour with the CLAUDE.md TDD loop.
 - Report per AC in ≤3 lines: cases · red reason · refactor (move – smell, or none: reason) · elapsed.
-- ⛔ after the first AC. Then continue unless a stop trigger fires.
+- ⛔ after the first AC: show the whole test file as the reviewer will see it. I approve its style (names, structure, values, fixtures) before any other test is written; later tests copy it.
 
 ## Phase 3 — Refactor pass ⛔
 - Review all code for the CLAUDE.md smells, unused abstractions, and the money, integrity and security rules. One smell per commit, `<check>` green each time.
 - Test-only review, as the reviewer would do it: read every test file without the production code. Fix hidden values, logic, unclear names, duplicate rules and fixture drift, one smell per `test(IKG-1): …` commit; delete a test that repeats another's rule.
 - If budget allows: mutation testing; a surviving mutant that shows a missing case gets a readable test.
 - Report: smell · location · move · commit.
+
+## Phase 3b — Cold review ⛔
+- Start a reviewer with no history (a fresh session, or `/code-review`) and give it only the brief and the rubric. It reads the tests first, then the code, and reports findings as file:line · issue · fix · severity.
+- Fix every high finding, one commit each. Then I read the test files myself; my notes are fixed before Phase 4.
+- Extras (mutation gates, scanners, extra suites) only after the rubric passes.
 
 ## Phase 4 — Docs, evidence, PR ⛔
 1. `docs/TICKET.md`: final ticket, assumptions, estimate vs actual time.
