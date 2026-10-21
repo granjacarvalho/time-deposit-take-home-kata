@@ -11,7 +11,7 @@ Needs **Java 17+** and **Docker** running. Maven comes with the wrapper. Command
 ```bash
 git clone https://github.com/granjacarvalho/time-deposit-take-home-kata.git
 cd time-deposit-take-home-kata/java
-./mvnw verify                 # format check, lint, 1,390 unit + 35 integration tests, coverage gate
+./mvnw verify                 # format check, lint, 389 unit + 24 integration tests, coverage gate
 ./mvnw spring-boot:test-run   # app on :8080, PostgreSQL 17 in Docker, demo data loaded
 ```
 
@@ -50,22 +50,22 @@ Hexagonal: domain and application have no Spring imports, enforced by `Architect
 One month = `balance × annual rate / 12`, rounded **HALF_UP to cents**, added to the balance (A-12). The legacy code does this in `double` and rounds with `new BigDecimal(double)`. Exact decimal maths would change results (basic 18.00 earns 0.01 today, 0.02 exactly), which the brief forbids, so:
 
 - 360 recorded cases pin today's results bit for bit (AC-1);
-- `InterestPrecisionTest` pins the error: never more than **0.01 per month** from exact maths (a probe over 30.6M balances found no larger gap);
+- the rounding cases in `TimeDepositCalculatorTest` pin the legacy result at each trap, and a scratch probe over 30.6M balances bounds the gap at **0.01 per month** from exact maths;
 - everything new (DB, API, conversion) is `BigDecimal`, and balances are capped below 10^13, where a `double` still holds every cent.
 
 ## Correctness, integrity and security
 
 | Risk | Control | Proof |
 |---|---|---|
-| Refactor changes a result | Golden master of 360 cases from the untouched upstream code | `TimeDepositCalculatorCharacterizationTest` |
-| Floating-point money | `BigDecimal`/`NUMERIC(15,2)` outside the legacy maths; error bound tested | `InterestPrecisionTest`, `JdbcTimeDepositRepositoryIT` |
-| Invalid rows from any writer | Schema: NOT NULL, FK, `balance >= 0`, `days >= 0`, `amount > 0`, max 13 integer digits | `SchemaIT` |
-| Two updates at once lose a month | One transaction per request; update path locks rows (`SELECT … FOR UPDATE`) | `UpdateBalancesIT` (4 parallel calls) |
+| Refactor changes a result | Golden master of 360 cases from the untouched upstream code | `TimeDepositCalculatorGoldenMasterTest` |
+| Floating-point money | `BigDecimal`/`NUMERIC(15,2)` outside the legacy maths; rounding traps pinned | `TimeDepositCalculatorTest` (rounding), `JdbcTimeDepositRepositoryIT` |
+| Invalid rows from any writer | Schema: NOT NULL, FK, `balance >= 0`, `days >= 0`, `amount > 0`, max 13 integer digits | `DatabaseConstraintsIT` |
+| Two updates at once lose a month | One transaction per request; update path locks rows (`SELECT … FOR UPDATE`) | `TimeDepositsApiIT` (4 parallel calls) |
 | List mixes two moments | Read-only `REPEATABLE READ` transaction | design decision |
 | SQL injection | Parameterized SQL only; no request input reaches SQL | code review |
-| Leaking internals or cached balances | Errors without trace/exception/message; `Cache-Control: no-store`, `nosniff` on every response | `ApiHardeningIT` |
+| Leaking internals or cached balances | Errors without trace/exception/message; `Cache-Control: no-store`, `nosniff` on every response | `TimeDepositsApiIT` (every response) |
 | Unauthorized balance update | **Assumption A-11:** gateway authentication; update needs an operations role | contract description |
-| Extra attack surface | Exactly two endpoints; no Actuator | `ApiSurfaceIT` (running app vs contract), `ApiHardeningIT` |
+| Extra attack surface | Exactly two endpoints, generated from the contract; no Actuator | `openapi.yaml`, `TimeDepositsApiIT` |
 | Vulnerable dependencies or code | Dependabot (Maven, Actions) and CodeQL on every PR | `.github/` |
 
 ## Decisions and trade-offs
@@ -93,7 +93,7 @@ One month = `balance × annual rate / 12`, rounded **HALF_UP to cents**, added t
 
 | | |
 |---|---|
-| Tests | 1,390 unit (1,000 of them random-balance precision cases) · 35 integration (Testcontainers PostgreSQL 17) |
+| Tests | 389 unit (360 of them the golden master) · 24 integration (Testcontainers PostgreSQL 17); one readable test per rule, see [TRACEABILITY](docs/TRACEABILITY.md) |
 | Coverage (domain + application, gated at 90%) | lines 72/73 · branches 10/10 |
 | Mutation (PIT, domain + application, gated at 90% in CI) | 33/33 killed · test strength 100% |
 | History | feat, refactor (each names smell + move), test, ci, docs and chore commits; see `git log --oneline` |
