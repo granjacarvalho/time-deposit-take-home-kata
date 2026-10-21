@@ -45,6 +45,10 @@ Key guardrails in `CLAUDE.md`: never edit a test to make it pass; never commit u
 - A commit that swallowed unrelated changes after a failed `git stash`; split before pushing.
 - A wrong figure in the README draft ("~3%" instead of 0.03–0.17%); corrected against the probe output.
 
+## What the guardrails missed
+
+The reviewers rejected the submission on test quality: structure, clarity, consistency. They were right that the rules optimised for proof a machine can count (coverage, mutation score, red reasons) and never for a person reading the tests. The result was overlapping suites, logic in tests and Java-unusual names. The rules are rewritten in `CLAUDE.md` (Tests) and `PROMPT.md` (Phase 3 test-only review); the tests in this repo still show the old style.
+
 ## Not included
 
 My private interview notes and slides prompt, and a machine-specific note (a JDK truststore workaround for this laptop). None of them shapes the code.
