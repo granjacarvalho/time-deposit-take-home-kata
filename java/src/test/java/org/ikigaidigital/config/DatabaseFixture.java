@@ -28,6 +28,23 @@ public final class DatabaseFixture {
         .update();
   }
 
+  /** Inserts a time deposit with a generated id and returns that id. */
+  public int insertTimeDeposit(String planType, int days, BigDecimal balance) {
+    return jdbc.sql(
+            "INSERT INTO timeDeposits (planType, days, balance) VALUES (?, ?, ?) RETURNING id")
+        .params(planType, days, balance)
+        .query(Integer.class)
+        .single();
+  }
+
+  /** Inserts a withdrawal dated 2026-10-01 with a generated id. */
+  public void insertWithdrawal(int timeDepositId, BigDecimal amount) {
+    jdbc.sql(
+            "INSERT INTO withdrawals (timeDepositId, amount, date) VALUES (?, ?, DATE '2026-10-01')")
+        .params(timeDepositId, amount)
+        .update();
+  }
+
   public void withdrawal(int id, int timeDepositId, String amount, String date) {
     jdbc.sql("INSERT INTO withdrawals (id, timeDepositId, amount, date) VALUES (?, ?, ?, ?)")
         .params(id, timeDepositId, new BigDecimal(amount), LocalDate.parse(date))
