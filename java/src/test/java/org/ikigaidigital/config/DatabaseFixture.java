@@ -22,7 +22,7 @@ public final class DatabaseFixture {
     jdbc.sql("DELETE FROM timeDeposits").update();
   }
 
-  public void timeDeposit(int id, String planType, int days, String balance) {
+  public void insertTimeDeposit(int id, String planType, int days, String balance) {
     jdbc.sql("INSERT INTO timeDeposits (id, planType, days, balance) VALUES (?, ?, ?, ?)")
         .params(id, planType, days, new BigDecimal(balance))
         .update();
@@ -45,7 +45,7 @@ public final class DatabaseFixture {
         .update();
   }
 
-  public void withdrawal(int id, int timeDepositId, String amount, String date) {
+  public void insertWithdrawal(int id, int timeDepositId, String amount, String date) {
     jdbc.sql("INSERT INTO withdrawals (id, timeDepositId, amount, date) VALUES (?, ?, ?, ?)")
         .params(id, timeDepositId, new BigDecimal(amount), LocalDate.parse(date))
         .update();

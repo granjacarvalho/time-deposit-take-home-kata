@@ -32,7 +32,7 @@ class JdbcTimeDepositRepositoryIT {
   @ParameterizedTest(name = "stored {0} loads as {0}")
   @CsvSource({"0.01", "18.01", "1234567.89", "9999999999999.99"})
   void loadsAStoredBalanceAsTheSameDouble(String balance) {
-    database.timeDeposit(1, "basic", 0, balance);
+    database.insertTimeDeposit(1, "basic", 0, balance);
 
     var deposits = repository.findAll();
 
@@ -45,7 +45,7 @@ class JdbcTimeDepositRepositoryIT {
   @ParameterizedTest(name = "{0} is saved as {0}")
   @CsvSource({"0.01", "18.01", "1234567.89", "9999999999999.99"})
   void savesABalanceWithoutLosingACent(String balance) {
-    database.timeDeposit(1, "basic", 0, "0.00");
+    database.insertTimeDeposit(1, "basic", 0, "0.00");
     var deposits = repository.findAll();
     deposits.forEach(deposit -> deposit.setBalance(Double.valueOf(balance)));
 
